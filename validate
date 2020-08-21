@@ -1,0 +1,25 @@
+validateToken = () => {
+    return (req, res, next) => {
+        if (!req.get("Token")){
+            res.json({
+                message: "access forbidden"
+            })
+        } else {
+            let token = req.get("Token")
+            let decryptToken = crypt.decrypt(token)
+            let sql = " select * from karyawan where ?"
+            let param = {id_karyawan: decryptToken}
+
+            db.query(sql, param, (error, result) => {
+                if (error) throw error 
+                if (result.length > 0){
+                    next()
+                } else {
+                    res.json({
+                        message: "invalid token"
+                    })
+                }
+            })
+        }
+    }
+}
